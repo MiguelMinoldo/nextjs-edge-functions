@@ -1,21 +1,15 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
+import type { NextFetchEvent, NextRequest  } from 'next/server'
 
-export function middleware(req: NextRequest) {
-  const basicAuth = req.headers.get('authorization')
+export function middleware(req: NextRequest, event: NextFetchEvent ) {
+    // Store the response so we can modify its headers
+    const response = NextResponse.next()
 
-  if (basicAuth) {
-    const auth = basicAuth.split(' ')[1]
-    const [user, pwd] = atob(auth).split(":")
+    console.log(req.geo?.country);
 
-    if (user === 'admin' && pwd === 'b') {
-      return NextResponse.next()
+    if (req.geo?.country === 'FR') {
+        response.headers.set('x-country-fr', 'true')
     }
-  }
 
-  return new Response('Auth required', {
-    status: 401,
-    headers: {
-      'WWW-Authenticate': 'Basic realm="Secure Area"',
-    },
-  })
+  return response;
 }
